@@ -117,6 +117,7 @@
   .ap-xbtn[aria-expanded=true]::after { transform: rotate(90deg); }
   .ap-xpanels { display: grid; gap: var(--cds-gap-md); }
   .ap-xpanels > [hidden] { display: none; }
+  .ap-stale { margin: var(--cds-gap-xs) 0 0; padding: 6px 10px; border-left: 3px solid var(--color-warn); background: var(--color-panel); font-size: var(--cds-font-size-caption); color: var(--color-fg); }
 </style>
 </head>
 <body>
@@ -130,6 +131,7 @@
       The platform is <b data-draw="activity" data-source="snapshot" data-field="activity">—</b>.
       <b data-draw="okcount" data-source="healthsum" data-field="ok">—</b> of <b data-draw="checks" data-source="healthsum" data-field="total">—</b> health checks are OK.
       Snapshot taken <b data-draw="taken" data-source="snapshot" data-field="taken">—</b>.</p>
+    <p class="ap-stale" id="ap-stale" hidden></p>
   </header>
 
   <div class="ap-main">
@@ -504,9 +506,13 @@
       } else {
         const j = await load(RAW + 'feed/status.json?t=' + Date.now()); window.dash._set(j.tables);   // may lag up to 5 min
       }
+      const tk = window.apField('snapshot', 'taken'), ms = tk ? Date.parse(tk.replace(' UTC', 'Z').replace(' ', 'T')) : NaN;
+      const age = isNaN(ms) ? null : Math.round((Date.now() - ms) / 60000), sb = document.getElementById('ap-stale');
+      if (sb) { sb.hidden = !(age != null && age > 25);
+        sb.textContent = 'No new status for ' + age + ' min. The platform service may be stopped (after an EC2 reboot it is started by hand); what is shown may be out of date.'; }
       lastOk = Date.now();
       const taken = window.apField('snapshot', 'taken') || '?';
-      say('on', 'Live · data ' + taken + ' · checked ' + t(new Date()));
+      say(age != null && age > 25 ? 'stale' : 'on', 'Live · data ' + taken + ' · checked ' + t(new Date()));
     } catch (e) {
       console.error(e);
       if (!lastOk) { window.dash._fail(); say('off', 'Status feed unreachable — retrying'); }
