@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMR Platform Status</title>
+<meta name="description" content="Live status of the AMR autonomous modeling platform (display only).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%232e8b57' stroke-width='3'/%3E%3Cpath d='M5 17h6l2-5 3 10 3-8 2 3h6' fill='none' stroke='%232e8b57' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root { color-scheme: light; --color-bg: #f7f6f3; --color-panel: #ffffff; --color-fg: #1f1e1c; --color-fg-muted: #6b6862; --color-border-line: #e3e0d9;
+    --color-ok: #2e8b57; --color-warn: #c98a12; --color-bad: #c8412f; --ap-series: #3a6fd8;
+    --cds-chart-axis: #a29f97; --cds-chart-grid: #ebe8e1; --cds-chart-muted: #d6d2c9; --cds-chart-reference: #3a6fd8;
+    --cds-surface-popover: #ffffff; --cds-border: #d9d5cc; --cds-shadow-popover: 0 6px 24px rgba(0,0,0,.12); --cds-text-secondary: #6b6862;
+    --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 16px; --cds-gap-lg: 24px; --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 12px; --cds-pad-lg: 20px;
+    --cds-radius: 10px; --cds-dur-slow: .25s; --cds-font-size-caption: 13px; --cds-font-size-body: 15px; --cds-font-size-heading: 16px; --cds-font-size-title: 30px;
+    --cds-font-weight-medium: 600; --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --font-serif: Georgia, "Times New Roman", serif; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --color-bg: #1b1a18; --color-panel: #242320; --color-fg: #ecebe7; --color-fg-muted: #a5a29a;
+    --color-border-line: #3a3833; --color-ok: #4fb37a; --color-warn: #e0a83a; --color-bad: #e66a55; --ap-series: #7ba2ff; --cds-chart-axis: #77746c; --cds-chart-grid: #34322e;
+    --cds-chart-muted: #4a4741; --cds-chart-reference: #7ba2ff; --cds-surface-popover: #2c2b28; --cds-border: #45423c; --cds-text-secondary: #a5a29a; } }
+  :root[data-theme="dark"] { color-scheme: dark; --color-bg: #1b1a18; --color-panel: #242320; --color-fg: #ecebe7; --color-fg-muted: #a5a29a;
+    --color-border-line: #3a3833; --color-ok: #4fb37a; --color-warn: #e0a83a; --color-bad: #e66a55; --ap-series: #7ba2ff; --cds-chart-axis: #77746c; --cds-chart-grid: #34322e;
+    --cds-chart-muted: #4a4741; --cds-chart-reference: #7ba2ff; --cds-surface-popover: #2c2b28; --cds-border: #45423c; --cds-text-secondary: #a5a29a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-family: var(--font-sans); }
+  body { padding: 24px 16px 32px; }
+  .ap-livebox { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+  .ap-live { display: inline-flex; align-items: center; gap: .4em; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .ap-live::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-fg-muted); }
+  .ap-live.on::before { background: var(--color-ok); animation: ap-blink 2s ease-in-out infinite; }
+  .ap-live.stale::before { background: var(--color-warn); }
+  .ap-live.off::before { background: var(--color-bad); }
+  @keyframes ap-blink { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .ap-live.on::before { animation: none; } }
+  .ap-foot { width: min(100%, calc(73% + var(--cds-gap-md))); margin: var(--cds-gap-lg) auto 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  @media (max-width: 1200px) { .ap-foot { width: min(100%, calc(92% + var(--cds-gap-md))); } }
+  @media (max-width: 900px) { .ap-foot { width: 100%; } }
+
+  .ap { width: min(100%, calc(73% + var(--cds-gap-md))); margin-inline: auto; display: grid; gap: var(--cds-gap-lg); font-family: var(--font-sans); color: var(--color-fg); }
+  .ap-head h1 { font-family: var(--font-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  .ap-take { margin: var(--cds-gap-xs) 0 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); max-width: 70ch; }
+  .ap .ap-take b { color: var(--color-fg); font-weight: 600; }
+  .ap-pill { display: inline-flex; align-items: center; gap: .4em; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--color-border-line); font-size: var(--cds-font-size-caption); font-weight: 600; }
+  .ap-pill::before { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: var(--color-fg-muted); }
+  .ap-pill.s-ok::before { background: var(--color-ok); }
+  .ap-pill.s-warn::before { background: var(--color-warn); }
+  .ap-pill.s-bad::before { background: var(--color-bad); }
+  .ap-main { display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 27fr); gap: var(--cds-gap-md); align-items: start; }
+  @media (max-width: 1200px) { .ap { width: min(100%, calc(92% + var(--cds-gap-md))); } .ap-main { grid-template-columns: minmax(0, 56fr) minmax(0, 36fr); } }
+  @media (max-width: 900px) { .ap { width: 100%; } .ap-main { grid-template-columns: minmax(0, 1fr); } }
+  .ap-side { display: grid; gap: var(--cds-gap-md); min-width: 0; }
+  .ap-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+  .ap-card h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+  .ap-note { margin: 2px 0 var(--cds-gap-sm); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .ap-cycle { position: relative; min-height: 300px; }
+  .ap-cycle svg { display: block; }
+  .ap-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-sm); }
+  .ap-legend span { display: inline-flex; align-items: center; gap: .35em; }
+  .ap-sw { width: .7rem; height: .7rem; border-radius: 50%; display: inline-block; background: var(--color-fg-muted); }
+  .ap-sw.s-ok { background: var(--color-ok); } .ap-sw.s-warn { background: var(--color-warn); } .ap-sw.s-bad { background: var(--color-bad); }
+  .ap-sw.s-wait { background: transparent; border: 2px solid var(--color-fg-muted); box-sizing: border-box; }
+  .ap-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); max-width: 260px; z-index: 2; }
+  .ap-tip .t1 { color: var(--cds-text-secondary); }
+  .ap-big { font-family: var(--font-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; }
+  .ap-kpis { display: flex; gap: var(--cds-gap-lg); flex-wrap: wrap; margin-bottom: var(--cds-gap-sm); }
+  .ap-kpis div { display: grid; }
+  .ap-kpis small { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .ap table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .ap th { text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); border-bottom: 1px solid var(--color-border-line); padding: 4px 6px; }
+  .ap td { border-bottom: 1px solid var(--color-border-line); padding: 5px 6px; vertical-align: top; }
+  .ap td.num, .ap th.num { text-align: right; }
+  .ap-scroll { overflow-x: auto; }
+  .ap-st { display: inline-flex; align-items: center; gap: .35em; white-space: nowrap; }
+  .ap-st::before { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: var(--color-fg-muted); }
+  .ap-st.s-ok::before { background: var(--color-ok); } .ap-st.s-warn::before { background: var(--color-warn); } .ap-st.s-bad::before { background: var(--color-bad); }
+  .ap-st.s-running::before { background: var(--cds-chart-reference); }
+  .ap-st.s-waiting::before, .ap-st.s-idle::before { background: transparent; border: 2px solid var(--color-fg-muted); box-sizing: border-box; }
+  .ap-bars { display: grid; gap: 6px; }
+  .ap-bar { display: grid; grid-template-columns: minmax(0, 11rem) 1fr 2.2rem; gap: 8px; align-items: center; font-size: var(--cds-font-size-caption); }
+  .ap-bar .lab { color: var(--color-fg); overflow-wrap: anywhere; }
+  .ap-bar .trk { height: 10px; background: var(--cds-chart-grid); border-radius: 3px; overflow: hidden; }
+  .ap-bar .fil { height: 100%; border-radius: 3px; background: var(--cds-chart-muted); }
+  .ap-bar .fil.on { background: var(--color-ok); }
+  .ap-bar .val { text-align: right; font-variant-numeric: tabular-nums; }
+  .ap h3 { font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); margin: var(--cds-gap-md) 0 var(--cds-gap-xs); text-transform: uppercase; letter-spacing: .04em; }
+  .ap-hist { display: grid; gap: 4px; font-size: var(--cds-font-size-caption); }
+  .ap-hist div { display: grid; grid-template-columns: 5.5rem 1fr 2.2rem; gap: 8px; }
+  .ap-hist .d { color: var(--color-fg-muted); } .ap-hist .n { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .ap-prog { display: grid; gap: var(--cds-gap-sm); font-size: var(--cds-font-size-caption); }
+  .ap-prog .ap-pstep { font-weight: var(--cds-font-weight-medium); }
+  .ap-prog .ap-prow { display: grid; gap: 4px; }
+  .ap-prog .ap-ptop { display: flex; justify-content: space-between; gap: var(--cds-gap-sm); flex-wrap: wrap; }
+  .ap-prog .ap-pnum { font-variant-numeric: tabular-nums; color: var(--color-fg-muted); }
+  .ap-prog .trk { height: 10px; background: var(--cds-chart-grid); border-radius: 3px; overflow: hidden; }
+  .ap-prog .fil { height: 100%; border-radius: 3px; display: block; }
+  .ap-prog .ap-idle { color: var(--color-fg-muted); }
+  .ap-details { display: grid; gap: var(--cds-gap-md); min-width: 0; }
+  [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+  [data-dash-source-state=empty] { color: transparent; }
+  .ap-fail { display: flex; align-items: center; justify-content: center; gap: .4em; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); min-height: 3rem; }
+  .ap-fail::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+  .ap-headrow { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--cds-gap-md); flex-wrap: wrap; }
+  .ap-refresh { font: inherit; font-size: var(--cds-font-size-caption); font-weight: 600; color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .ap-refresh:hover { border-color: var(--color-fg-muted); }
+  .ap-refresh:disabled { opacity: .6; cursor: progress; }
+  .ap-refresh[aria-busy=true]::after { content: "…"; }
+  .ap-beat-run { animation: ap-beat var(--ap-beat-dur, 1.6s) linear infinite; }
+  @keyframes ap-beat { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { .ap-beat-run { animation: none; stroke-dasharray: none; opacity: .9; } }
+  .ap-xrow { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); }
+  .ap-xbtn { flex: 1 1 100%; display: flex; flex-wrap: wrap; align-items: center; gap: var(--cds-gap-sm); font: inherit; text-align: left; cursor: pointer; color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-sm) var(--cds-pad-md); }
+  .ap-xbtn:hover { border-color: var(--color-fg-muted); }
+  .ap-xbtn:focus-visible { outline: 2px solid var(--color-fg-muted); outline-offset: 2px; }
+  .ap-xbtn .ap-xt { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+  .ap-xbtn .ap-xmeta { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin-left: auto; }
+  .ap-xbtn::after { content: "▸"; color: var(--color-fg-muted); transition: transform var(--cds-dur-slow); }
+  .ap-xbtn[aria-expanded=true] { border-color: var(--color-fg-muted); }
+  .ap-xbtn[aria-expanded=true]::after { transform: rotate(90deg); }
+  .ap-xpanels { display: grid; gap: var(--cds-gap-md); }
+  .ap-xpanels > [hidden] { display: none; }
+</style>
+</head>
+<body>
+<div class="ap">
+  <header class="ap-head" id="top">
+    <div class="ap-headrow">
+      <h1>AMR platform status</h1>
+      <div class="ap-livebox"><span class="ap-live" id="ap-live">Connecting…</span><button type="button" class="ap-refresh" id="ap-refresh" title="Load the latest status now">↻ Refresh</button></div>
+    </div>
+    <p class="ap-take">Overall: <span class="ap-pill" data-draw="pill" data-source="snapshot" data-field="label">—</span>
+      The platform is <b data-draw="activity" data-source="snapshot" data-field="activity">—</b>.
+      <b data-draw="okcount" data-source="healthsum" data-field="ok">—</b> of <b data-draw="checks" data-source="healthsum" data-field="total">—</b> health checks are OK.
+      Snapshot taken <b data-draw="taken" data-source="snapshot" data-field="taken">—</b>.</p>
+  </header>
+
+  <div class="ap-main">
+    <section class="ap-card" id="cycle">
+      <h2>Iteration cycle</h2>
+      <p class="ap-note">Each round runs clockwise from Plan to Adoption. Status is from the latest real round; hover a stage for its rule and result.</p>
+      <div class="ap-cycle" data-draw="cycle" data-source="stages snapshot progress"></div>
+      <div class="ap-legend" aria-label="Status key">
+        <span><i class="ap-sw s-ok"></i>OK</span>
+        <span><i class="ap-sw s-warn"></i>Deviation recorded</span>
+        <span><i class="ap-sw s-bad"></i>Failed</span>
+        <span><i class="ap-sw s-run"></i>Running now</span>
+        <span><i class="ap-sw s-wait"></i>Waiting or not run</span>
+      </div>
+    </section>
+
+    <aside class="ap-side">
+      <section class="ap-card" id="now">
+        <h2>Current step</h2>
+        <p class="ap-note">Counted from the files the step writes. Time left is estimated from the pace so far.</p>
+        <div class="ap-prog" data-draw="prog" data-source="progress"></div>
+      </section>
+      <div class="ap-details" id="details">
+      <div class="ap-xrow" role="group" aria-label="Detail tables">
+        <button type="button" class="ap-xbtn" data-panel="iterations" aria-controls="iterations" aria-expanded="false"><span class="ap-xt">Iterations</span><span class="ap-xmeta"><b data-draw="itotal" data-source="itertotal" data-field="total">—</b> runs · <b data-draw="ireal" data-source="itertotal" data-field="real_completed">—</b> real done</span></button>
+        <button type="button" class="ap-xbtn" data-panel="scope" aria-controls="scope" aria-expanded="false"><span class="ap-xt">Current scope</span><span class="ap-xmeta"><b data-draw="scopepairs" data-source="scope" data-field="value" data-where="item=Enabled pairs (pilot)">—</b> enabled pairs</span></button>
+        <button type="button" class="ap-xbtn" data-panel="health" aria-controls="health" aria-expanded="false"><span class="ap-xt">Health checks</span><span class="ap-xmeta"><b data-draw="okcount" data-source="healthsum" data-field="ok">—</b> of <b data-draw="checks" data-source="healthsum" data-field="total">—</b> OK</span></button>
+        <button type="button" class="ap-xbtn" data-panel="parameters" aria-controls="parameters" aria-expanded="false"><span class="ap-xt">Processes and parameters</span><span class="ap-xmeta">rule and latest result</span></button>
+        <button type="button" class="ap-xbtn" data-panel="enabling" aria-controls="enabling" aria-expanded="false"><span class="ap-xt">Enabling status</span><span class="ap-xmeta">classes and pairs</span></button>
+      </div>
+      <div class="ap-xpanels">
+          <section class="ap-card" id="iterations" hidden>
+            <h2>Iterations</h2>
+            <p class="ap-note">Every envelope the platform has run. Tests often halt by design.</p>
+            <div class="ap-kpis">
+              <div><span class="ap-big" data-draw="itotal" data-source="itertotal" data-field="total">—</span><small>runs</small></div>
+              <div><span class="ap-big" data-draw="icomp" data-source="itertotal" data-field="completed">—</span><small>completed</small></div>
+              <div><span class="ap-big" data-draw="ireal" data-source="itertotal" data-field="real_completed">—</span><small>real rounds completed</small></div>
+            </div>
+            <table data-source="itercounts" data-row-key="kind">
+              <thead><tr><th data-field="kind">Kind</th><th class="num" data-field="runs">Runs</th><th class="num" data-field="completed">Completed</th><th class="num" data-field="halted">Halted</th></tr></thead>
+              <tbody data-draw="itable"></tbody>
+            </table>
+          </section>
+          <section class="ap-card" id="scope" hidden>
+            <h2>Current scope</h2>
+            <table data-source="scope" data-row-key="item">
+              <thead><tr><th data-field="item">Item</th><th data-field="value">Value</th></tr></thead>
+              <tbody data-draw="stable"></tbody>
+            </table>
+          </section>
+        <section class="ap-card" id="health" hidden>
+          <h2>Health checks</h2>
+          <p class="ap-note">Critical checks set the overall status; the others are shown for follow-up.</p>
+          <div class="ap-scroll">
+            <table data-source="health" data-row-key="check">
+              <thead><tr><th data-field="check">Check</th><th data-field="status">Status</th><th data-field="value">Value</th><th data-field="limit">Limit</th></tr></thead>
+              <tbody data-draw="htable"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="ap-card" id="parameters" hidden>
+          <h2>Processes and parameters</h2>
+          <p class="ap-note">The rule each process enforces and what the latest real round recorded.</p>
+          <div class="ap-scroll">
+            <table data-source="stages" data-row-key="stage">
+              <thead><tr><th class="num" data-field="order">#</th><th data-field="stage">Process</th><th data-field="status">Status</th><th data-field="value">Rule</th><th data-field="note">Latest</th></tr></thead>
+              <tbody data-draw="ptable"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="ap-card" id="enabling" hidden>
+          <h2>Enabling status</h2>
+          <p class="ap-note">Classes from the v95 merged table (production device); pairs from the pilot register.</p>
+          <h3>Classes</h3>
+          <div class="ap-bars" data-draw="ebars-class" data-source="enabling"></div>
+          <h3>Drug × organism pairs</h3>
+          <div class="ap-bars" data-draw="ebars-pair" data-source="enabling"></div>
+          <h3>Enabled pairs over time</h3>
+          <div class="ap-hist" data-draw="hist" data-source="history"></div>
+        </section>
+      </div>
+      </div>
+    </aside>
+  </div>
+
+</div>
+<p class="ap-foot">Display only. The page checks the platform's status feed every 30 seconds; the platform publishes a new snapshot about every 1–2 minutes while a round runs. Server paths and file names are removed from the public feed.</p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+(() => {
+  const store = {}, draws = {}, calcs = [], listeners = [];
+  const css = () => getComputedStyle(document.documentElement);
+  const empty = (st) => ({ status: st || 'loading', data: [], columns: [], refreshing: false });
+  window.dash = {
+    get colors() { const c = css().getPropertyValue('--ap-series').trim() || '#3a6fd8'; return [c, '#d0662f', '#2e8b57', '#8a5cc2', '#b8892f', '#3f9fb0', '#c2477a', '#6b7f2e']; },
+    data(id) { const c = calcs.find((x) => x.id === id); return c ? (c.result || empty()) : (store[id] || empty()); },
+    calc(id, o) { calcs.push({ id, inputs: o.inputs, fn: o.fn }); },
+    draw(name, fn) { draws[name] = fn; },
+    onData(fn) { listeners.push(fn); },
+    refresh() { window.apPoll && window.apPoll(true); },
+    _set(tables, status) {
+      Object.keys(tables || {}).forEach((k) => { store[k] = { status: 'ok', data: tables[k].rows, columns: tables[k].columns, refreshing: false }; });
+      if (status) Object.keys(store).forEach((k) => { if (store[k].status !== 'ok') store[k].status = status; });
+      window.dash._render();
+    },
+    _fail() { ['snapshot', 'stages', 'health', 'iterations', 'scope', 'enabling', 'history', 'progress'].forEach((k) => { if (!store[k]) store[k] = empty('error'); }); window.dash._render(); },
+    _render() {
+      calcs.forEach((c) => { const ins = c.inputs.map((i) => window.dash.data(i));
+        const bad = ins.find((d) => d.status !== 'ok');
+        if (bad) { c.result = empty(bad.status); return; }
+        try { const v = c.fn(...ins.map((d) => d.data)); c.result = { status: 'ok', data: Array.isArray(v) ? v : [v], columns: [] }; }
+        catch (e) { console.error(c.id, e); c.result = empty('error'); } });
+      listeners.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
+      Object.keys(draws).forEach((name) => document.querySelectorAll('[data-draw="' + name + '"]').forEach((el) => {
+        if (el.closest('[hidden]')) return;
+        try { draws[name](el); } catch (e) { console.error(name, e); } }));
+    },
+  };
+})();
+</script>
+<script>
+  dash.calc('itercounts', {
+    title: 'Runs by kind',
+    description: 'Runs per kind of iteration; completed means done or closed by the owner.',
+    inputs: ['iterations'],
+    fn: (iterations) => ['Real round', 'Validation', 'Phase 1 test', 'Phase 2 test', 'Other']
+      .map((k) => { const g = iterations.filter((r) => r.kind === k);
+        return {kind: k, runs: g.length, completed: g.filter((r) => r.status === 'done' || r.status === 'closed').length,
+                halted: g.filter((r) => r.status === 'halted').length}; })
+      .filter((r) => r.runs > 0)
+  });
+  dash.calc('itertotal', {
+    title: 'Run totals',
+    description: 'All runs, completed runs, and real rounds completed (done or closed).',
+    inputs: ['iterations'],
+    fn: (iterations) => { const c = (r) => r.status === 'done' || r.status === 'closed';
+      return [{total: iterations.length, completed: iterations.filter(c).length,
+               real_completed: iterations.filter((r) => r.kind === 'Real round' && c(r)).length}]; }
+  });
+  dash.calc('healthsum', {
+    title: 'Health checks OK',
+    description: 'How many health checks report OK, of all checks.',
+    inputs: ['health'],
+    fn: (health) => [{ok: health.filter((r) => r.status === 'ok').length, total: health.length}]
+  });
+
+  window.apField = (id, f) => { const d = dash.data(id); return d.status === 'ok' && d.data.length ? d.data[0][f] : null; };
+  const one = (name, id, f) => dash.draw(name, (el) => { const v = window.apField(id, f); el.textContent = v == null ? '—' : String(v); });
+  one('activity', 'snapshot', 'activity'); one('taken', 'snapshot', 'taken');
+  one('okcount', 'healthsum', 'ok'); one('checks', 'healthsum', 'total');
+  dash.draw('scopepairs', (el) => { const d = dash.data('scope');
+    const r = d.status === 'ok' ? d.data.find((x) => x.item === 'Enabled pairs (pilot)') : null;
+    el.textContent = r ? String(r.value) : '—'; });
+  one('itotal', 'itertotal', 'total'); one('icomp', 'itertotal', 'completed'); one('ireal', 'itertotal', 'real_completed');
+  dash.draw('pill', (el) => {
+    const v = window.apField('snapshot', 'label'), o = window.apField('snapshot', 'overall');
+    el.textContent = v == null ? '—' : v; el.className = 'ap-pill' + (o ? ' s-' + o : '');
+  });
+
+  const fail = (el) => { el.replaceChildren(); const d = document.createElement('div'); d.className = 'ap-fail'; d.textContent = 'Failed to load'; el.append(d); };
+  const rowsTable = (name, id, cols, fmt) => dash.draw(name, (tb) => {
+    const d = dash.data(id); tb.replaceChildren();
+    if (d.status !== 'ok') return;
+    d.data.forEach((r) => { const tr = document.createElement('tr');
+      cols.forEach((c) => { const td = document.createElement('td'); if (c.num) td.className = 'num';
+        if (c.status) { const s = document.createElement('span'); s.className = 'ap-st s-' + r[c.key]; s.textContent = window.apLabel(r[c.key]); td.append(s); }
+        else td.textContent = r[c.key] == null ? '' : String(r[c.key]);
+        tr.append(td); });
+      tb.append(tr); });
+  });
+  window.apLabel = (s) => ({ok: 'OK', warn: 'Deviation', bad: 'Failed', running: 'Running', waiting: 'Waiting', idle: 'Not run'}[s] || s);
+  document.querySelectorAll('.ap-sw.s-run').forEach((e) => { e.style.background = dash.colors[0]; });
+  rowsTable('itable', 'itercounts', [{key: 'kind'}, {key: 'runs', num: 1}, {key: 'completed', num: 1}, {key: 'halted', num: 1}]);
+  rowsTable('stable', 'scope', [{key: 'item'}, {key: 'value'}]);
+  rowsTable('htable', 'health', [{key: 'check'}, {key: 'status', status: 1}, {key: 'value'}, {key: 'limit'}]);
+  rowsTable('ptable', 'stages', [{key: 'order', num: 1}, {key: 'stage'}, {key: 'status', status: 1}, {key: 'value'}, {key: 'note'}]);
+
+  const bars = (name, level) => dash.draw(name, (el) => {
+    const d = dash.data('enabling'); el.replaceChildren();
+    if (d.status === 'error') return fail(el);
+    if (d.status !== 'ok') { el.textContent = '—'; return; }
+    const rows = d.data.filter((r) => r.level === level), max = d3.max(rows, (r) => +r.count) || 1;
+    rows.forEach((r) => { const row = document.createElement('div'); row.className = 'ap-bar';
+      const lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = r.category;
+      const trk = document.createElement('span'); trk.className = 'trk';
+      const fil = document.createElement('span'); fil.className = 'fil' + (r.category === 'Enabled' ? ' on' : ''); fil.style.width = (100 * r.count / max) + '%'; fil.style.display = 'block';
+      trk.append(fil);
+      const val = document.createElement('span'); val.className = 'val'; val.textContent = d3.format(',')(+r.count);
+      row.append(lab, trk, val); el.append(row); });
+  });
+  bars('ebars-class', 'Class'); bars('ebars-pair', 'Pair');
+  dash.draw('hist', (el) => {
+    const d = dash.data('history'); el.replaceChildren();
+    if (d.status === 'error') return fail(el);
+    if (d.status !== 'ok') { el.textContent = '—'; return; }
+    d.data.forEach((r) => { const row = document.createElement('div');
+      const a = document.createElement('span'); a.className = 'd'; a.textContent = d3.utcFormat('%b %-d, %Y')(new Date(r.date + 'T00:00:00Z'));
+      const b = document.createElement('span'); b.textContent = r.event;
+      const c = document.createElement('span'); c.className = 'n'; c.textContent = r.enabled_pairs;
+      row.append(a, b, c); el.append(row); });
+  });
+
+  dash.draw('prog', (el) => {
+    const d = dash.data('progress'); el.replaceChildren();
+    if (d.status === 'error') return fail(el);
+    if (d.status !== 'ok') { el.textContent = '—'; return; }
+    if (!d.data.length) { const p = document.createElement('div'); p.className = 'ap-idle';
+      const act = window.apField('snapshot', 'activity');
+      p.textContent = act && act.startsWith('running') ? 'The step running now is short; no counter is needed.' : 'No round is running.'; el.append(p); return; }
+    const st = document.createElement('div'); st.className = 'ap-pstep'; st.textContent = `${d.data[0].order}. ${d.data[0].stage}`; el.append(st);
+    const f = d3.format(',');
+    d.data.forEach((r) => {
+      const row = document.createElement('div'); row.className = 'ap-prow';
+      const top = document.createElement('div'); top.className = 'ap-ptop';
+      const a = document.createElement('span'); a.textContent = r.part;
+      const b = document.createElement('span'); b.className = 'ap-pnum';
+      const left = +r.done >= +r.total ? 'done' : (r.eta_min === '' || r.eta_min == null ? 'waiting' : `about ${f(Math.round(+r.eta_min))} min left`);
+      b.textContent = `${f(+r.done)} of ${f(+r.total)} · ${left}`;
+      top.append(a, b);
+      const trk = document.createElement('span'); trk.className = 'trk'; trk.style.display = 'block';
+      trk.setAttribute('role', 'progressbar'); trk.setAttribute('aria-valuenow', r.pct); trk.setAttribute('aria-valuemin', 0); trk.setAttribute('aria-valuemax', 100);
+      trk.setAttribute('aria-label', r.part);
+      const fil = document.createElement('span'); fil.className = 'fil'; fil.style.width = Math.min(100, +r.pct) + '%';
+      fil.style.background = +r.done >= +r.total ? 'var(--color-ok)' : dash.colors[0];
+      trk.append(fil); row.append(top, trk); el.append(row);
+    });
+    if (d.data[0].elapsed_min !== '' && d.data[0].elapsed_min != null) {
+      const e = document.createElement('div'); e.className = 'ap-pnum'; e.textContent = `Step running for ${f(Math.round(+d.data[0].elapsed_min))} min`; el.append(e); }
+  });
+
+  dash.draw('cycle', (el) => {
+    const d = dash.data('stages'); el.replaceChildren();
+    if (d.status === 'error' || dash.data('snapshot').status === 'error') return fail(el);
+    if (d.status !== 'ok') return;
+    const rows = d.data.slice().sort((a, b) => a.order - b.order), n = rows.length;
+    const wrap = (t) => t.split(' ').reduce((ls, wd) => { const L = ls[ls.length - 1];
+      if (L && (L + ' ' + wd).length <= 14) ls[ls.length - 1] = L + ' ' + wd; else ls.push(wd); return ls; }, []);
+    const lines = rows.map((r) => wrap(`${r.order}. ${r.stage}`));
+    const lw = 6.8 * (d3.max(lines, (ls) => d3.max(ls, (l) => l.length)) || 14) + 32;
+    const w = Math.max(300, el.clientWidth), narrow = w / 2 - lw < 120;
+    const h = narrow ? w : Math.min(440, w * 0.8), cx = w / 2, cy = h / 2;
+    const R = Math.min(cx - (narrow ? 34 : lw), cy - (narrow ? 38 : 52)), nodeR = narrow ? 13 : 16;
+    const showGroups = !narrow && R >= 165;
+    const css = getComputedStyle(el), col = (v) => css.getPropertyValue(v).trim();
+    const color = {ok: col('--color-ok'), warn: col('--color-warn'), bad: col('--color-bad'), running: dash.colors[0]};
+    const glyph = {ok: '✓', warn: '!', bad: '×', running: '▸', waiting: '…', idle: '–'};
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${w} ${h}`).attr('role', 'img')
+      .attr('aria-label', 'Iteration cycle with the status of each process');
+    const ang = (i) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    svg.append('defs').append('marker').attr('id', 'ap-arrow').attr('viewBox', '0 0 10 10').attr('refX', 5).attr('refY', 5)
+      .attr('markerWidth', 6).attr('markerHeight', 6).attr('orient', 'auto')
+      .append('path').attr('d', 'M0,0 L10,5 L0,10 z').attr('fill', col('--cds-chart-axis'));
+    // group arcs just inside the ring
+    const groups = d3.groups(rows.map((r, i) => ({...r, i})), (r) => r.group);
+    const arc = d3.arc().innerRadius(R - 20).outerRadius(R - 14).cornerRadius(3);
+    const step = (2 * Math.PI) / n;
+    groups.forEach(([g, rs], gi) => {
+      const a0 = rs[0].i * step - step * 0.42, a1 = rs[rs.length - 1].i * step + step * 0.42;
+      svg.append('path').attr('transform', `translate(${cx},${cy})`).attr('d', arc({startAngle: a0, endAngle: a1}))
+        .attr('fill', gi % 2 ? col('--cds-chart-muted') : col('--cds-chart-grid'));
+      if (showGroups) { const am = (a0 + a1) / 2 - Math.PI / 2, rr = R - 34;
+        svg.append('text').attr('x', cx + rr * Math.cos(am)).attr('y', cy + rr * Math.sin(am)).attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle').attr('fill', col('--color-fg-muted')).attr('font-size', 11).attr('letter-spacing', '.04em').text(g.toUpperCase()); }
+    });
+    // ring segments with arrows between nodes
+    rows.forEach((r, i) => {
+      const a0 = ang(i) + (nodeR + 3) / R, a1 = ang(i + 1) - (nodeR + 6) / R;
+      const p = d3.path(); p.arc(cx, cy, R, a0, a1);
+      svg.append('path').attr('d', p.toString()).attr('fill', 'none').attr('stroke', col('--cds-chart-axis')).attr('stroke-width', 1.5)
+        .attr('marker-end', 'url(#ap-arrow)').attr('stroke-dasharray', i === n - 1 ? '4 3' : null);
+    });
+    const tip = document.createElement('div'); tip.className = 'ap-tip'; tip.hidden = true; el.append(tip);
+    rows.forEach((r, i) => {
+      const x = cx + R * Math.cos(ang(i)), y = cy + R * Math.sin(ang(i));
+      const g = svg.append('g').attr('tabindex', 0).style('cursor', 'default');
+      const filled = color[r.status];
+      g.append('circle').attr('cx', x).attr('cy', y).attr('r', nodeR + 8).attr('fill', 'transparent');
+      g.append('circle').attr('cx', x).attr('cy', y).attr('r', nodeR).attr('fill', filled || col('--color-panel'))
+        .attr('stroke', filled ? col('--color-panel') : col('--color-fg-muted')).attr('stroke-width', 2);
+      g.append('text').attr('x', x).attr('y', y).attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+        .attr('font-size', narrow ? 11 : 13).attr('font-weight', 700).attr('fill', filled ? col('--color-panel') : col('--color-fg-muted'))
+        .text(narrow ? r.order : glyph[r.status] || '');
+      const c = Math.cos(ang(i)), s = Math.sin(ang(i)), lr = R + nodeR + 8 + (Math.abs(c) >= 0.2 ? (lines[i].length - 1) * 5 : 0);
+      const anchor = Math.abs(c) < 0.2 ? 'middle' : c > 0 ? 'start' : 'end';
+      const lx = cx + lr * c, ly = cy + lr * s + (Math.abs(c) < 0.2 ? (s < 0 ? -4 : 12) : 4);
+      if (!narrow) {
+        const ls = lines[i], side = Math.abs(c) >= 0.2;
+        const y0 = side ? ly - (ls.length - 1) * 7 : s < 0 ? ly - (ls.length - 1) * 14 : ly;
+        const t = g.append('text').attr('x', lx).attr('y', y0).attr('text-anchor', anchor).attr('font-size', 12).attr('fill', col('--color-fg'));
+        ls.forEach((l, j) => t.append('tspan').attr('x', lx).attr('dy', j ? 14 : 0).text(l));
+      }
+      const show = () => { tip.replaceChildren();
+        const a = document.createElement('div'); a.className = 't1'; a.textContent = `${r.order}. ${r.stage} · ${window.apLabel(r.status)}`;
+        const b = document.createElement('div'); b.textContent = `${r.parameter}: ${r.value}`;
+        tip.append(a, b);
+        if (r.note) { const e = document.createElement('div'); e.textContent = r.note; tip.append(e); }
+        tip.hidden = false;
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        tip.style.left = Math.max(0, Math.min(w - tw, x - tw / 2)) * (el.clientWidth / w) + 'px';
+        tip.style.top = Math.max(0, (y > cy ? y - th - nodeR - 10 : y + nodeR + 10)) * (el.clientWidth / w) + 'px'; };
+      g.on('mouseenter', show).on('focus', show).on('mouseleave', () => { tip.hidden = true; }).on('blur', () => { tip.hidden = true; });
+    });
+    // centre: overall health
+    const lab = window.apField('snapshot', 'label') || '—', ov = window.apField('snapshot', 'overall');
+    const pg = dash.data('progress'), prow = pg.status === 'ok' ? pg.data : [];
+    const frac = prow.length ? d3.mean(prow, (p) => Math.min(1, (+p.done) / (+p.total || 1))) : null;
+    rows.forEach((r, i) => { if (r.status !== 'running') return;
+      const x = cx + R * Math.cos(ang(i)), y = cy + R * Math.sin(ang(i));
+      svg.insert('circle', ':first-child').attr('cx', x).attr('cy', y).attr('r', nodeR + 6).attr('fill', 'none')
+        .attr('stroke', col('--cds-chart-grid')).attr('stroke-width', 4);
+      if (frac != null && +prow[0].order === +r.order) {
+        svg.append('path').attr('transform', `translate(${x},${y})`)
+          .attr('d', d3.arc().innerRadius(nodeR + 4).outerRadius(nodeR + 8).startAngle(0).endAngle(2 * Math.PI * frac).cornerRadius(2)())
+          .attr('fill', dash.colors[0]);
+      } });
+    const r0 = Math.max(40, R - (showGroups ? 66 : 40)), k = Math.max(0.68, Math.min(1, r0 / 130));
+    svg.append('circle').attr('cx', cx).attr('cy', cy).attr('r', r0).attr('fill', col('--color-bg'))
+      .attr('stroke', color[ov] || col('--color-border-line')).attr('stroke-width', 3);
+    svg.append('text').attr('x', cx).attr('y', cy - 12 * k).attr('text-anchor', 'middle').attr('font-size', Math.max(9, 11 * k))
+      .attr('fill', col('--color-fg-muted')).attr('letter-spacing', '.06em').text('PLATFORM HEALTH');
+    svg.append('text').attr('x', cx).attr('y', cy + 20 * k).attr('text-anchor', 'middle').attr('font-family', col('--font-serif'))
+      .attr('font-size', 30 * k).attr('fill', color[ov] || col('--color-fg')).text(lab);
+    const lr = window.apField('snapshot', 'last_real_round');
+    if (lr) {
+      svg.append('text').attr('x', cx).attr('y', cy + 38 * k).attr('text-anchor', 'middle').attr('font-size', Math.max(9, 11 * k))
+        .attr('fill', col('--color-fg-muted')).text('latest round');
+      svg.append('text').attr('x', cx).attr('y', cy + 38 * k + Math.max(11, 14 * k)).attr('text-anchor', 'middle').attr('font-size', Math.max(9, 11 * k))
+        .attr('fill', col('--color-fg-muted')).text(lr);
+    }
+    // heartbeat above the centre text: running = full pace, healthy idle = slow, warn = amber, bad = flat line
+    const act = window.apField('snapshot', 'activity') || '';
+    const running = act.startsWith('running'), flat = ov === 'bad';
+    const bw = Math.min(220, 1.5 * r0), bh = 0.26 * r0;
+    const bx = cx - bw / 2, by = cy - 0.4 * r0;
+    const u = bw / 20, pts = flat ? [[0, 0], [20, 0]]
+      : [[0, 0], [6, 0], [7, -0.15], [8, 0], [8.8, 0], [9.4, 0.35], [10.2, -1], [11, 0.55], [11.6, 0], [13.2, 0], [14.2, -0.25], [15.2, 0], [20, 0]];
+    const line = d3.line().x((q) => bx + q[0] * u).y((q) => by + q[1] * bh);
+    const bc = flat ? color.bad : ov === 'warn' ? color.warn : running ? dash.colors[0] : color.ok;
+    svg.append('path').attr('d', line(pts)).attr('fill', 'none').attr('stroke', bc).attr('stroke-width', 2)
+      .attr('stroke-linejoin', 'round').attr('opacity', flat ? 0.9 : 0.25);
+    if (!flat) {
+      svg.append('path').attr('d', line(pts)).attr('pathLength', 100).attr('fill', 'none').attr('stroke', bc)
+        .attr('stroke-width', 3).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round')
+        .attr('stroke-dasharray', '26 74').attr('class', 'ap-beat-run')
+        .style('--ap-beat-dur', running ? '1.6s' : '3.2s');
+    }
+    svg.append('desc').text(flat ? 'Heartbeat: flat line, the platform needs attention'
+      : running ? 'Heartbeat: beating, a round is running' : 'Heartbeat: slow beat, healthy and idle');
+  });
+</script>
+<script>
+(() => {
+  const REPO = 'BengiBio/amr-platform-status';
+  const API = 'https://api.github.com/repos/' + REPO + '/commits/feed';
+  const RAW = 'https://raw.githubusercontent.com/' + REPO + '/';
+  const POLL_S = 30;
+  let sha = null, busy = false, lastOk = 0;
+  const live = document.getElementById('ap-live');
+  const t = (d) => d.toISOString().slice(11, 19) + ' UTC';
+  const say = (cls, txt) => { if (live) { live.className = 'ap-live ' + cls; live.textContent = txt; } };
+  const btns = () => document.querySelectorAll('.ap-refresh');
+  async function load(url) { const r = await fetch(url, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); }
+  window.apPoll = async (force) => {
+    if (busy) return; busy = true; btns().forEach((b) => { b.disabled = true; b.setAttribute('aria-busy', 'true'); });
+    try {
+      let next = null;
+      try { const r = await fetch(API, { headers: { Accept: 'application/vnd.github.sha' }, cache: force ? 'reload' : 'no-cache' });
+        if (r.ok) next = (await r.text()).trim(); } catch (e) { next = null; }
+      if (next && /^[0-9a-f]{40}$/.test(next)) {
+        if (next !== sha || force) { const j = await load(RAW + next + '/status.json'); sha = next; window.dash._set(j.tables); }
+      } else {
+        const j = await load(RAW + 'feed/status.json?t=' + Date.now()); window.dash._set(j.tables);   // may lag up to 5 min
+      }
+      lastOk = Date.now();
+      const taken = window.apField('snapshot', 'taken') || '?';
+      say('on', 'Live · data ' + taken + ' · checked ' + t(new Date()));
+    } catch (e) {
+      console.error(e);
+      if (!lastOk) { window.dash._fail(); say('off', 'Status feed unreachable — retrying'); }
+      else say('stale', 'Feed not reachable · showing data from ' + (window.apField('snapshot', 'taken') || '?'));
+    } finally { busy = false; btns().forEach((b) => { b.disabled = false; b.setAttribute('aria-busy', 'false'); }); }
+  };
+  btns().forEach((b) => b.addEventListener('click', () => window.apPoll(true)));
+  document.querySelectorAll('.ap-xbtn[data-panel]').forEach((btn) => btn.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    const p = document.getElementById(btn.dataset.panel); if (p) p.hidden = !open;
+    window.dash._render();
+  }));
+  let rt = null; new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => window.dash._render(), 120); }).observe(document.body);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => window.dash._render());
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) window.apPoll(false); });
+  window.dash._render(); window.apPoll(false);
+  setInterval(() => { if (!document.hidden) window.apPoll(false); }, POLL_S * 1000);
+})();
+</script>
+</body>
+</html>
