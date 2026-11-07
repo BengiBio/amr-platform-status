@@ -525,7 +525,7 @@
       svg.append('text').attr('x', x(i)).attr('y', h - m.b + 15).attr('text-anchor', 'middle').attr('font-size', 11)
         .attr('fill', col('--color-fg-muted')).text(d3.utcFormat('%b %-d')(p.d));
       svg.append('text').attr('x', x(i)).attr('y', h - m.b + 28).attr('text-anchor', 'middle').attr('font-size', 10)
-        .attr('fill', col('--color-fg-muted')).text(/set39/.test(p.e) ? 'first baseline' : /baseline/.test(p.e) ? 'set45 baseline' : (p.e.match(/set\d+/) || [p.e])[0] + ' round');
+        .attr('fill', col('--color-fg-muted')).text(/set39/.test(p.e) ? 'first baseline' : /baseline/.test(p.e) ? 'set45 baseline' : /quarantine/.test(p.e) ? 'data cleanup' : (p.e.match(/set\d+/) || [p.e])[0] + ' round');
     }); });
 </script>
 <script>
