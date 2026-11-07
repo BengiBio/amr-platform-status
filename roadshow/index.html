@@ -187,8 +187,8 @@
         <div class="ap-prog" data-draw="prog" data-source="progress"></div>
       </section>
       <section class="ap-card" id="rounds">
-        <h2>Round results</h2>
-        <p class="ap-note">Each pair is scored once, on Holdout genomes the models never saw.</p>
+        <h2>Pairs validated by the platform</h2>
+        <p class="ap-note">Each passed its single scored look on Holdout genomes the models never saw; a round in progress shows as running.</p>
         <div class="ap-scroll"><table>
           <thead><tr><th>Drug · organism</th><th class="num">Genomes</th><th>Result</th><th>Decision</th></tr></thead>
           <tbody data-draw="rtable"></tbody>
@@ -495,7 +495,7 @@
   kpi('k-hours', () => { const r = doneRounds(); if (!r) return null; const h = r.filter((x) => x.status === 'done' || x.status === 'closed').map((x) => +x.hours);
     return h.length ? d3.format('.1f')(d3.median(h)) : '—'; });
   dash.draw('rtable', (tb) => { const r = rows('rounds'); tb.replaceChildren(); if (!r) return;
-    r.slice().reverse().forEach((x) => { const tr = document.createElement('tr');
+    r.filter((x) => x.gate === 'PASS' || x.status === 'running').reverse().forEach((x) => { const tr = document.createElement('tr');
       const c = (t, cls) => { const td = document.createElement('td'); if (cls) td.className = cls; td.textContent = t; tr.append(td); return td; };
       const [dr, sp] = x.pair.split(' / '); c(sp ? dr + ' · ' + sp.replace(/^(\S)\S+ /, '$1. ') : x.pair); c(x.genomes_qualified || '—', 'num');
       const g = c(''); const p = document.createElement('span');
