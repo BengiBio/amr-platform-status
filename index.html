@@ -58,6 +58,8 @@
   .ap-sw { width: .7rem; height: .7rem; border-radius: 50%; display: inline-block; background: var(--color-fg-muted); }
   .ap-sw.s-ok { background: var(--color-ok); } .ap-sw.s-warn { background: var(--color-warn); } .ap-sw.s-bad { background: var(--color-bad); }
   .ap-sw.s-wait { background: transparent; border: 2px solid var(--color-fg-muted); box-sizing: border-box; }
+  .ap-sw.s-na { background: var(--cds-chart-grid); border: 1.5px dashed var(--color-fg-muted); box-sizing: border-box; opacity: .8; }
+  .ap-st.s-na::before { background: var(--cds-chart-grid); }
   .ap-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); max-width: 260px; z-index: 2; }
   .ap-tip .t1 { color: var(--cds-text-secondary); }
   .ap-big { font-family: var(--font-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; }
@@ -137,7 +139,7 @@
   <div class="ap-main">
     <section class="ap-card" id="cycle">
       <h2>Iteration cycle</h2>
-      <p class="ap-note">Each round runs clockwise from Plan to Adoption. Status is from the latest real round; hover a stage for its rule and result.</p>
+      <p class="ap-note">Each round runs clockwise from Plan to Adoption. Status is from the run in progress, or the latest round; hover a stage for its rule and result.</p>
       <div class="ap-cycle" data-draw="cycle" data-source="stages snapshot progress"></div>
       <div class="ap-legend" aria-label="Status key">
         <span><i class="ap-sw s-ok"></i>OK</span>
@@ -145,6 +147,7 @@
         <span><i class="ap-sw s-bad"></i>Failed</span>
         <span><i class="ap-sw s-run"></i>Running now</span>
         <span><i class="ap-sw s-wait"></i>Waiting or not run</span>
+        <span><i class="ap-sw s-na"></i>Not part of this run</span>
       </div>
     </section>
 
@@ -303,7 +306,7 @@
         tr.append(td); });
       tb.append(tr); });
   });
-  window.apLabel = (s) => ({ok: 'OK', warn: 'Deviation', bad: 'Failed', running: 'Running', waiting: 'Waiting', idle: 'Not run'}[s] || s);
+  window.apLabel = (s) => ({ok: 'OK', warn: 'Deviation', bad: 'Failed', running: 'Running', waiting: 'Waiting', idle: 'Not run', na: 'Not part of this run'}[s] || s);
   document.querySelectorAll('.ap-sw.s-run').forEach((e) => { e.style.background = dash.colors[0]; });
   rowsTable('itable', 'itercounts', [{key: 'kind'}, {key: 'runs', num: 1}, {key: 'completed', num: 1}, {key: 'halted', num: 1}]);
   rowsTable('stable', 'scope', [{key: 'item'}, {key: 'value'}]);
@@ -378,7 +381,7 @@
     const showGroups = !narrow && R >= 165;
     const css = getComputedStyle(el), col = (v) => css.getPropertyValue(v).trim();
     const color = {ok: col('--color-ok'), warn: col('--color-warn'), bad: col('--color-bad'), running: dash.colors[0]};
-    const glyph = {ok: '✓', warn: '!', bad: '×', running: '▸', waiting: '…', idle: '–'};
+    const glyph = {ok: '✓', warn: '!', bad: '×', running: '▸', waiting: '…', idle: '–', na: ''};
     const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${w} ${h}`).attr('role', 'img')
       .attr('aria-label', 'Iteration cycle with the status of each process');
     const ang = (i) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
@@ -410,8 +413,10 @@
       const g = svg.append('g').attr('tabindex', 0).style('cursor', 'default');
       const filled = color[r.status];
       g.append('circle').attr('cx', x).attr('cy', y).attr('r', nodeR + 8).attr('fill', 'transparent');
-      g.append('circle').attr('cx', x).attr('cy', y).attr('r', nodeR).attr('fill', filled || col('--color-panel'))
-        .attr('stroke', filled ? col('--color-panel') : col('--color-fg-muted')).attr('stroke-width', 2);
+      const na = r.status === 'na';   // step not in this run's envelope (e.g. no intake in a quarantine rebuild)
+      g.append('circle').attr('cx', x).attr('cy', y).attr('r', nodeR).attr('fill', na ? col('--cds-chart-grid') : (filled || col('--color-panel')))
+        .attr('stroke', na ? col('--color-fg-muted') : (filled ? col('--color-panel') : col('--color-fg-muted'))).attr('stroke-width', na ? 1.2 : 2)
+        .attr('stroke-dasharray', na ? '3 3' : null).attr('opacity', na ? 0.8 : null);
       g.append('text').attr('x', x).attr('y', y).attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
         .attr('font-size', narrow ? 11 : 13).attr('font-weight', 700).attr('fill', filled ? col('--color-panel') : col('--color-fg-muted'))
         .text(narrow ? r.order : glyph[r.status] || '');
@@ -421,7 +426,7 @@
       if (!narrow) {
         const ls = lines[i], side = Math.abs(c) >= 0.2;
         const y0 = side ? ly - (ls.length - 1) * 7 : s < 0 ? ly - (ls.length - 1) * 14 : ly;
-        const t = g.append('text').attr('x', lx).attr('y', y0).attr('text-anchor', anchor).attr('font-size', 12).attr('fill', col('--color-fg'));
+        const t = g.append('text').attr('x', lx).attr('y', y0).attr('text-anchor', anchor).attr('font-size', 12).attr('fill', na ? col('--color-fg-muted') : col('--color-fg'));
         ls.forEach((l, j) => t.append('tspan').attr('x', lx).attr('dy', j ? 14 : 0).text(l));
       }
       const show = () => { tip.replaceChildren();
@@ -460,7 +465,7 @@
       svg.append('text').attr('x', cx).attr('y', cy + 38 * k).attr('text-anchor', 'middle').attr('font-size', Math.max(9, 11 * k))
         .attr('fill', col('--color-fg-muted')).text('latest round');
       svg.append('text').attr('x', cx).attr('y', cy + 38 * k + Math.max(11, 14 * k)).attr('text-anchor', 'middle').attr('font-size', Math.max(9, 11 * k))
-        .attr('fill', col('--color-fg-muted')).text(lr);
+        .attr('fill', col('--color-fg-muted')).text(lr.replace(/_\d{8}$/, '').replace(/_/g, ' '));
     }
     // heartbeat above the centre text: running = full pace, healthy idle = slow, warn = amber, bad = flat line
     const act = window.apField('snapshot', 'activity') || '';
