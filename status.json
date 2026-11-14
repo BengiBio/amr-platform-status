@@ -1,0 +1,1538 @@
+{
+ "feed": 1,
+ "taken": "2026-11-14 19:07 UTC",
+ "tables": {
+  "snapshot": {
+   "columns": [
+    "taken",
+    "overall",
+    "last_real_round",
+    "label",
+    "activity"
+   ],
+   "rows": [
+    {
+     "taken": "2026-11-14 19:07 UTC",
+     "overall": "warn",
+     "last_real_round": "set54_auto_20261111",
+     "label": "Needs attention",
+     "activity": "idle, waiting for owner approval"
+    }
+   ]
+  },
+  "stages": {
+   "columns": [
+    "order",
+    "stage",
+    "group",
+    "status",
+    "note",
+    "parameter",
+    "value"
+   ],
+   "rows": [
+    {
+     "order": "1",
+     "stage": "Plan",
+     "group": "Plan",
+     "status": "ok",
+     "note": "proposal: imipenem / Klebsiella pneumoniae, piperacillin-tazobactam / Klebsiella pneumoniae, levofloxacin / Escherichia coli",
+     "parameter": "Admission ladder",
+     "value": "P(pass) >= 80% -> 70% -> 60%"
+    },
+    {
+     "order": "2",
+     "stage": "Owner approval",
+     "group": "Plan",
+     "status": "waiting",
+     "note": "next round waits for owner approval",
+     "parameter": "Pre-registration",
+     "value": "written before selection; 1 look per pair"
+    },
+    {
+     "order": "3",
+     "stage": "Label-blind selection",
+     "group": "Intake",
+     "status": "ok",
+     "note": "seeded, label-blind",
+     "parameter": "Source cap",
+     "value": "<= 40% per source (draw and scored set)"
+    },
+    {
+     "order": "4",
+     "stage": "Download + CheckM2",
+     "group": "Intake",
+     "status": "ok",
+     "note": "QC done",
+     "parameter": "Genome QC",
+     "value": "complete >= 90%, contamination < 5%"
+    },
+    {
+     "order": "5",
+     "stage": "Novelty audit",
+     "group": "Intake",
+     "status": "ok",
+     "note": "every genome new",
+     "parameter": "Novelty",
+     "value": "BioSample, assembly, BV-BRC id, isolate, md5"
+    },
+    {
+     "order": "6",
+     "stage": "Annotation",
+     "group": "Intake",
+     "status": "ok",
+     "note": "",
+     "parameter": "Annotators",
+     "value": "RGI, AMRFinderPlus (pinned)"
+    },
+    {
+     "order": "7",
+     "stage": "Merge to Holdout",
+     "group": "Data",
+     "status": "ok",
+     "note": "dry run, merge, verify",
+     "parameter": "Routing",
+     "value": "100% to the permanent Holdout"
+    },
+    {
+     "order": "8",
+     "stage": "Feature rebuild",
+     "group": "Model",
+     "status": "ok",
+     "note": "137930 rows",
+     "parameter": "Recipe",
+     "value": "all 19 raw classes, set45 baseline config"
+    },
+    {
+     "order": "9",
+     "stage": "Blind sandbox training",
+     "group": "Model",
+     "status": "ok",
+     "note": "",
+     "parameter": "Seeds",
+     "value": "1, 2, 3; no Holdout label visible"
+    },
+    {
+     "order": "10",
+     "stage": "Regression gate",
+     "group": "Model",
+     "status": "ok",
+     "note": "Train = baseline",
+     "parameter": "Tolerance",
+     "value": "max |diff| <= 1e-9 before any look"
+    },
+    {
+     "order": "11",
+     "stage": "Holdout look",
+     "group": "Evaluate",
+     "status": "ok",
+     "note": "1 of 5 pairs PASS 3/3",
+     "parameter": "Gate",
+     "value": "S >= 20, ME < 3%, abstention <= 10%, 3/3 seeds"
+    },
+    {
+     "order": "12",
+     "stage": "Report",
+     "group": "Evaluate",
+     "status": "ok",
+     "note": "result e-mailed",
+     "parameter": "Calibration",
+     "value": "pass rate >= rung - 10 points"
+    },
+    {
+     "order": "13",
+     "stage": "S3 archive",
+     "group": "Archive",
+     "status": "ok",
+     "note": "",
+     "parameter": "Verify",
+     "value": "every key and size matches"
+    },
+    {
+     "order": "14",
+     "stage": "Adoption",
+     "group": "Decide",
+     "status": "ok",
+     "note": "signed: tigecycline / Acinetobacter baumannii on hold",
+     "parameter": "Rule",
+     "value": "owner-signed record; register edited by hand"
+    }
+   ]
+  },
+  "health": {
+   "columns": [
+    "check",
+    "critical",
+    "status",
+    "value",
+    "limit",
+    "note"
+   ],
+   "rows": [
+    {
+     "check": "Service",
+     "critical": "True",
+     "status": "ok",
+     "value": "active",
+     "limit": "active",
+     "note": ""
+    },
+    {
+     "check": "Free disk",
+     "critical": "True",
+     "status": "warn",
+     "value": "52 GB",
+     "limit": "warn < 60, pause < 40, halt < 25 GB",
+     "note": ""
+    },
+    {
+     "check": "Free memory",
+     "critical": "True",
+     "status": "ok",
+     "value": "12.8 GB",
+     "limit": ">= 12.3 GB before a round (largest stage peak + reserve)",
+     "note": ""
+    },
+    {
+     "check": "Planner calibration",
+     "critical": "True",
+     "status": "ok",
+     "value": "OK (fewer than 10 pairs at rung(s) 80%, 70%, 60%)",
+     "limit": "no halt",
+     "note": "0 rounds in history"
+    },
+    {
+     "check": "Open halts (real rounds)",
+     "critical": "True",
+     "status": "ok",
+     "value": "0",
+     "limit": "0",
+     "note": "closed rounds are not open halts"
+    },
+    {
+     "check": "Code committed",
+     "critical": "False",
+     "status": "warn",
+     "value": "20 file(s) changed",
+     "limit": "clean",
+     "note": ""
+    },
+    {
+     "check": "Queue",
+     "critical": "False",
+     "status": "ok",
+     "value": "0 queued, 0 running",
+     "limit": "1 at a time",
+     "note": ""
+    },
+    {
+     "check": "Phase 2 sign-off",
+     "critical": "False",
+     "status": "warn",
+     "value": "open",
+     "limit": "signed",
+     "note": "AWS action links deferred; reboot test pending"
+    },
+    {
+     "check": "Holdout access log",
+     "critical": "False",
+     "status": "ok",
+     "value": "69 entries",
+     "limit": "every read logged",
+     "note": ""
+    }
+   ]
+  },
+  "iterations": {
+   "columns": [
+    "iteration",
+    "kind",
+    "status",
+    "stages_done",
+    "started",
+    "finished",
+    "note"
+   ],
+   "rows": [
+    {
+     "iteration": "phase1_repro_kp2_20261105",
+     "kind": "Phase 1 test",
+     "status": "done",
+     "stages_done": "5",
+     "started": "2026-11-05 16:54",
+     "finished": "2026-11-05 16:55",
+     "note": ""
+    },
+    {
+     "iteration": "phase1_incremental_set44_to_set45_20261105",
+     "kind": "Phase 1 test",
+     "status": "done",
+     "stages_done": "7",
+     "started": "2026-11-05 17:01",
+     "finished": "2026-11-05 17:02",
+     "note": ""
+    },
+    {
+     "iteration": "phase1_dataprep_kp2_20261105",
+     "kind": "Phase 1 test",
+     "status": "done",
+     "stages_done": "7",
+     "started": "2026-11-05 17:07",
+     "finished": "2026-11-05 17:27",
+     "note": ""
+    },
+    {
+     "iteration": "phase1_acq_checks_set45_20261105",
+     "kind": "Phase 1 test",
+     "status": "halted",
+     "stages_done": "2",
+     "started": "2026-11-05 18:35",
+     "finished": "",
+     "note": "Halt: source cap exceeded on the scored set: colistin: PRJNA643814 64% of genomes, 68% of S; trimethoprim-sulfamethoxazo"
+    },
+    {
+     "iteration": "phase1_merge_set45_sandbox_20261105",
+     "kind": "Phase 1 test",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-05 19:06",
+     "finished": "2026-11-05 19:18",
+     "note": ""
+    },
+    {
+     "iteration": "phase1_select_finalize_set45_20261105",
+     "kind": "Phase 1 test",
+     "status": "done",
+     "stages_done": "8",
+     "started": "2026-11-05 19:35",
+     "finished": "2026-11-05 19:40",
+     "note": ""
+    },
+    {
+     "iteration": "phase1_novelty_annotate_set45_20261105",
+     "kind": "Phase 1 test",
+     "status": "halted",
+     "stages_done": "3",
+     "started": "2026-11-05 19:46",
+     "finished": "",
+     "note": "Halt: 4 novelty must catch every merged set45 genome: rc 1, success marker MISSING (see platform log)"
+    },
+    {
+     "iteration": "phase1_novelty_annotate_set45_v2_20261105",
+     "kind": "Phase 1 test",
+     "status": "halted",
+     "stages_done": "3",
+     "started": "2026-11-05 19:53",
+     "finished": "",
+     "note": "Halt: 4 novelty must catch every merged set45 genome: rc 1, success marker MISSING (see platform log)"
+    },
+    {
+     "iteration": "phase1_novelty_annotate_set45_v3_20261105",
+     "kind": "Phase 1 test",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-05 19:59",
+     "finished": "2026-11-05 20:27",
+     "note": ""
+    },
+    {
+     "iteration": "phase1_qc_verify_set45_20261105",
+     "kind": "Phase 1 test",
+     "status": "halted",
+     "stages_done": "1",
+     "started": "2026-11-05 20:44",
+     "finished": "",
+     "note": "Halt: 2 download + CheckM2 for 3 genomes : log matches halt pattern 'list_[a-z]+ FAILED' (see platform log)"
+    },
+    {
+     "iteration": "phase1_qc_verify_set45_v2_20261105",
+     "kind": "Phase 1 test",
+     "status": "done",
+     "stages_done": "8",
+     "started": "2026-11-05 21:00",
+     "finished": "2026-11-05 21:10",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_blind_kp2_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "6",
+     "started": "2026-11-06 03:36",
+     "finished": "2026-11-06 03:37",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_blind_kp2_v2_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "6",
+     "started": "2026-11-06 03:38",
+     "finished": "2026-11-06 03:39",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_regress_incremental_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "7",
+     "started": "2026-11-06 03:39",
+     "finished": "2026-11-06 03:40",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_sandbox_kp2_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "1",
+     "started": "2026-11-06 03:56",
+     "finished": "",
+     "note": "Halt: code snapshot differs from the live file for orchestrator: [path]"
+    },
+    {
+     "iteration": "phase2_sandbox_kp2_v2_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "7",
+     "started": "2026-11-06 03:56",
+     "finished": "2026-11-06 03:57",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_sandbox_all216_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "7",
+     "started": "2026-11-06 03:58",
+     "finished": "2026-11-06 04:22",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_sandbox_all216_v2_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "7",
+     "started": "2026-11-06 04:22",
+     "finished": "2026-11-06 04:46",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_code_change_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "3",
+     "started": "2026-11-06 07:24",
+     "finished": "2026-11-06 07:26",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_instance_fail_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:24",
+     "finished": "",
+     "note": "Halt: instance check: does not fit ({'cores': 92, 'free_disk_gb': 126.0}); not launched, size e-mailed"
+    },
+    {
+     "iteration": "phase2_memory_gate_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:24",
+     "finished": "",
+     "note": "Halt: stage 1 big stage needs 500 GB (recorded peak) but only 13.0 GB available for 1 min"
+    },
+    {
+     "iteration": "phase2_plan_pipeline_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "3",
+     "started": "2026-11-06 07:24",
+     "finished": "2026-11-06 07:24",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_plan_calib_halt_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:25",
+     "finished": "",
+     "note": "Halt: planner: admission halted -- HALT: pairs predicted >= 80% passed 60% over 10 pairs (< 70%); a human must approve a"
+    },
+    {
+     "iteration": "phase2_fail_disk_halt_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:31",
+     "finished": "",
+     "note": "Halt: free disk 101 GB < 1000 GB"
+    },
+    {
+     "iteration": "phase2_fail_disk_pause_20261106",
+     "kind": "Phase 2 test",
+     "status": "stopped",
+     "stages_done": "0",
+     "started": "2026-11-06 07:31",
+     "finished": "",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_fail_s3_block_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "2",
+     "started": "2026-11-06 07:31",
+     "finished": "2026-11-06 07:31",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_fail_s3_partial_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "2",
+     "started": "2026-11-06 07:31",
+     "finished": "2026-11-06 07:32",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_fail_s3_partial_v2_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "3",
+     "started": "2026-11-06 07:32",
+     "finished": "2026-11-06 07:32",
+     "note": ""
+    },
+    {
+     "iteration": "phase2_pf_dropped_row_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:36",
+     "finished": "",
+     "note": "Halt: prepared-data check FAILED: (genome, class) rows differ: sandbox 11865 vs reference 11866"
+    },
+    {
+     "iteration": "phase2_pf_patch_only_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:36",
+     "finished": "",
+     "note": "Halt: prepared-data check FAILED: {\"rows\": 11866, \"columns\": 222, \"final_classes\": [\"polymyxin\", \"sulfonamide\"], \"column"
+    },
+    {
+     "iteration": "phase2_pf_undefined_name_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:36",
+     "finished": "",
+     "note": "Halt: preflight lint FAILED: PREFLIGHT FAIL: 1 fatal, 0 warning(s) (see platform log)"
+    },
+    {
+     "iteration": "phase2_pf_no_organism_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:37",
+     "finished": "",
+     "note": "Halt: 1 annotate (smoke test): rc 1, success marker MISSING (see platform log)"
+    },
+    {
+     "iteration": "phase2_pf_patch_only_v2_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:37",
+     "finished": "",
+     "note": "Halt: prepared-data check FAILED: {\"rows\": 11866, \"columns\": 222, \"final_classes\": [\"polymyxin\", \"sulfonamide\"], \"column"
+    },
+    {
+     "iteration": "phase2_pf_no_organism_v2_20261106",
+     "kind": "Phase 2 test",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 07:42",
+     "finished": "",
+     "note": "Halt: 1 annotate (smoke test): rc 1, success marker MISSING; script says: smoke check FAIL: AMRFinderPlus --organism ena"
+    },
+    {
+     "iteration": "phase2_fail_kill_service_20261106",
+     "kind": "Phase 2 test",
+     "status": "done",
+     "stages_done": "3",
+     "started": "2026-11-06 12:37",
+     "finished": "2026-11-06 12:41",
+     "note": ""
+    },
+    {
+     "iteration": "repro_set44_full_20261106",
+     "kind": "Validation",
+     "status": "halted",
+     "stages_done": "7",
+     "started": "2026-11-06 14:38",
+     "finished": "",
+     "note": "Halt: 8 hash comparison (every output): rc 1, success marker MISSING (see platform log)"
+    },
+    {
+     "iteration": "set46_topup_20261106",
+     "kind": "Real round",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-06 17:21",
+     "finished": "",
+     "note": "Halt: 1 set44 validation must have passed: rc 1, success marker MISSING (see platform log)"
+    },
+    {
+     "iteration": "set46_topup_v2_20261106",
+     "kind": "Real round",
+     "status": "closed",
+     "stages_done": "21",
+     "started": "2026-11-06 17:46",
+     "finished": "2026-11-06 22:37",
+     "note": ""
+    },
+    {
+     "iteration": "set47_route3_20261106",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "22",
+     "started": "2026-11-06 23:43",
+     "finished": "2026-11-07 12:42",
+     "note": ""
+    },
+    {
+     "iteration": "study35651495_quarantine_20261107",
+     "kind": "Other",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-07 13:11",
+     "finished": "",
+     "note": "Halt: input check failed: orchestrator: md5 e4704546cb3dcd3a5f7a74a91c28ba1a != envelope da017b073f514d7408f4412c6211629"
+    },
+    {
+     "iteration": "study35651495_quarantine_v2_20261107",
+     "kind": "Other",
+     "status": "halted",
+     "stages_done": "5",
+     "started": "2026-11-07 13:16",
+     "finished": "",
+     "note": "Halt: 6 regression gate: every unaffected pair equals the set45 baseline (no Holdout read): rc 1, success marker MISSING"
+    },
+    {
+     "iteration": "study35651495_quarantine_v3_20261107",
+     "kind": "Other",
+     "status": "halted",
+     "stages_done": "4",
+     "started": "2026-11-07 16:21",
+     "finished": "",
+     "note": "Halt: Holdout look REFUSED by the scoring service: REFUSED: [path]"
+    },
+    {
+     "iteration": "study35651495_quarantine_v4_20261107",
+     "kind": "Other",
+     "status": "halted",
+     "stages_done": "3",
+     "started": "2026-11-07 16:50",
+     "finished": "",
+     "note": "Halt: 4 the 8 pairs trained exactly as in v3 (same Train genomes, labels, OOF scores; no Holdout read): rc 1, success ma"
+    },
+    {
+     "iteration": "study35651495_quarantine_v5_20261107",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "7",
+     "started": "2026-11-07 16:58",
+     "finished": "2026-11-07 17:00",
+     "note": ""
+    },
+    {
+     "iteration": "set48_route3_20261107",
+     "kind": "Real round",
+     "status": "halted",
+     "stages_done": "8",
+     "started": "2026-11-07 17:35",
+     "finished": "",
+     "note": "Halt: source cap exceeded on the scored set: ciprofloxacin: NCBI_antibiogram;NDARO;PATRIC:United States of America 47.7%"
+    },
+    {
+     "iteration": "set48_route3_v2_20261107",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "22",
+     "started": "2026-11-07 18:26",
+     "finished": "2026-11-07 22:02",
+     "note": ""
+    },
+    {
+     "iteration": "set49_topup_20261107",
+     "kind": "Real round",
+     "status": "halted",
+     "stages_done": "8",
+     "started": "2026-11-07 22:23",
+     "finished": "",
+     "note": "Halt: source cap exceeded on the scored set: amikacin: 29340588 40.6% of genomes; 29340588 38.7% of S; amoxicillin-clavu"
+    },
+    {
+     "iteration": "set49_topup_v2_20261107",
+     "kind": "Real round",
+     "status": "halted",
+     "stages_done": "9",
+     "started": "2026-11-07 23:30",
+     "finished": "",
+     "note": "Halt: 10 independent intake verification: rc 1, success marker MISSING (see platform log)"
+    },
+    {
+     "iteration": "set49_topup_v3_20261108",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "22",
+     "started": "2026-11-08 00:25",
+     "finished": "2026-11-08 04:20",
+     "note": ""
+    },
+    {
+     "iteration": "set50_topup_20261108",
+     "kind": "Real round",
+     "status": "halted",
+     "stages_done": "10",
+     "started": "2026-11-08 13:17",
+     "finished": "",
+     "note": "Halt: 11 annotation : rc 1, success marker MISSING; script says: HALT: only 29 / 35 FASTAs (see platform log)"
+    },
+    {
+     "iteration": "set50_topup_v2_20261108",
+     "kind": "Real round",
+     "status": "halted",
+     "stages_done": "0",
+     "started": "2026-11-08 15:08",
+     "finished": "",
+     "note": "Halt: input check failed: run_pairs: md5 c4d92fdc3994713fcaccc42c8fa01f97 != envelope 37870cf4c758a21ee0b357de7d001f78"
+    },
+    {
+     "iteration": "set50_topup_v3_20261108",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "22",
+     "started": "2026-11-08 15:14",
+     "finished": "2026-11-08 18:47",
+     "note": ""
+    },
+    {
+     "iteration": "expansion_b1_regression_20261108",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "10",
+     "started": "2026-11-08 21:18",
+     "finished": "2026-11-08 21:57",
+     "note": ""
+    },
+    {
+     "iteration": "expansion_b1_look_20261108",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-08 21:57",
+     "finished": "2026-11-08 22:05",
+     "note": ""
+    },
+    {
+     "iteration": "set51_auto_20261109",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "22",
+     "started": "2026-11-09 21:18",
+     "finished": "2026-11-10 00:51",
+     "note": ""
+    },
+    {
+     "iteration": "set52_auto_20261110",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "22",
+     "started": "2026-11-10 01:00",
+     "finished": "2026-11-10 04:39",
+     "note": ""
+    },
+    {
+     "iteration": "expansion_b2_regression_20261110",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "10",
+     "started": "2026-11-10 14:18",
+     "finished": "2026-11-10 15:05",
+     "note": ""
+    },
+    {
+     "iteration": "expansion_b2_look_20261110",
+     "kind": "Other",
+     "status": "halted",
+     "stages_done": "7",
+     "started": "2026-11-10 15:05",
+     "finished": "",
+     "note": "Halt: scoring service failed (exit 1); see [path]"
+    },
+    {
+     "iteration": "expansion_b2_look_v2_20261110",
+     "kind": "Other",
+     "status": "halted",
+     "stages_done": "4",
+     "started": "2026-11-10 15:26",
+     "finished": "",
+     "note": "Halt: code snapshot differs from the live file for holdout_scorer: [path]"
+    },
+    {
+     "iteration": "expansion_b2_look_v3_20261110",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-10 15:31",
+     "finished": "2026-11-10 15:48",
+     "note": ""
+    },
+    {
+     "iteration": "set53_auto_20261110",
+     "kind": "Real round",
+     "status": "halted",
+     "stages_done": "8",
+     "started": "2026-11-10 17:31",
+     "finished": "",
+     "note": "Halt: source cap exceeded on the scored set: ceftriaxone / Shigella sonnei: PMID-group:24082120 44.8% of genomes; PMID-g"
+    },
+    {
+     "iteration": "set53_auto_v2_20261110",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "18",
+     "started": "2026-11-10 21:35",
+     "finished": "2026-11-11 03:38",
+     "note": ""
+    },
+    {
+     "iteration": "set54_auto_20261111",
+     "kind": "Real round",
+     "status": "done",
+     "stages_done": "23",
+     "started": "2026-11-11 03:49",
+     "finished": "2026-11-11 07:10",
+     "note": ""
+    },
+    {
+     "iteration": "tietr_control_20261111",
+     "kind": "Other",
+     "status": "halted",
+     "stages_done": "5",
+     "started": "2026-11-11 09:59",
+     "finished": "",
+     "note": "Halt: pinned code changed after the iteration started (before stage 6 S3 sync to platform prefix): ['run_pairs']. Restor"
+    },
+    {
+     "iteration": "tietr_look_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-11 11:11",
+     "finished": "2026-11-11 12:00",
+     "note": ""
+    },
+    {
+     "iteration": "spmech_oof_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "6",
+     "started": "2026-11-11 12:10",
+     "finished": "2026-11-11 12:22",
+     "note": ""
+    },
+    {
+     "iteration": "four_look_A_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-11 12:27",
+     "finished": "2026-11-11 12:32",
+     "note": ""
+    },
+    {
+     "iteration": "four_look_B_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-11 12:32",
+     "finished": "2026-11-11 12:34",
+     "note": ""
+    },
+    {
+     "iteration": "allfix_oof_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "6",
+     "started": "2026-11-11 13:10",
+     "finished": "2026-11-11 14:14",
+     "note": ""
+    },
+    {
+     "iteration": "allfix_look_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-11 14:19",
+     "finished": "2026-11-11 15:15",
+     "note": ""
+    },
+    {
+     "iteration": "adopted_full_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "6",
+     "started": "2026-11-11 15:35",
+     "finished": "2026-11-11 16:35",
+     "note": ""
+    },
+    {
+     "iteration": "enabled_check_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-11 16:40",
+     "finished": "2026-11-11 16:42",
+     "note": ""
+    },
+    {
+     "iteration": "adopted_full_v2_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "6",
+     "started": "2026-11-11 16:42",
+     "finished": "2026-11-11 17:41",
+     "note": ""
+    },
+    {
+     "iteration": "adopted_full_v3_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "6",
+     "started": "2026-11-11 17:51",
+     "finished": "2026-11-11 18:47",
+     "note": ""
+    },
+    {
+     "iteration": "explor_check_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-11 19:02",
+     "finished": "2026-11-11 19:04",
+     "note": ""
+    },
+    {
+     "iteration": "explor_check2_20261111",
+     "kind": "Other",
+     "status": "done",
+     "stages_done": "9",
+     "started": "2026-11-11 19:14",
+     "finished": "2026-11-11 19:18",
+     "note": ""
+    }
+   ]
+  },
+  "scope": {
+   "columns": [
+    "item",
+    "value",
+    "note"
+   ],
+   "rows": [
+    {
+     "item": "Enabled pairs (pilot)",
+     "value": "105",
+     "note": ""
+    },
+    {
+     "item": "Species with an enabled pair",
+     "value": "12",
+     "note": ""
+    },
+    {
+     "item": "Production classes (v94, inference 0.8.8)",
+     "value": "15",
+     "note": "per-class device; unchanged by the platform"
+    },
+    {
+     "item": "Pilot baseline",
+     "value": "set45 baseline (50)",
+     "note": "no-loss comparisons"
+    },
+    {
+     "item": "Latest real round",
+     "value": "set54_auto_20261111: 1 of 5 PASS",
+     "note": ""
+    },
+    {
+     "item": "Next proposal",
+     "value": "imipenem / Klebsiella pneumoniae (0.65), piperacillin-tazobactam / Klebsiella pneumoniae (0.62), levofloxacin / Escherichia coli (0.66)",
+     "note": "277 genomes, 9.6 h"
+    },
+    {
+     "item": "Device",
+     "value": "resistant-only",
+     "note": "RESISTANT or NO CALL"
+    },
+    {
+     "item": "Time budget per round",
+     "value": "<= 12 h",
+     "note": ""
+    }
+   ]
+  },
+  "enabling": {
+   "columns": [
+    "level",
+    "category",
+    "count"
+   ],
+   "rows": [
+    {
+     "level": "Class",
+     "category": "Enabled",
+     "count": "15"
+    },
+    {
+     "level": "Class",
+     "category": "Fails ME",
+     "count": "4"
+    },
+    {
+     "level": "Class",
+     "category": "Fails ME and abstention",
+     "count": "4"
+    },
+    {
+     "level": "Class",
+     "category": "Fails abstention",
+     "count": "3"
+    },
+    {
+     "level": "Class",
+     "category": "Not evaluable (< 20 S in Holdout)",
+     "count": "3"
+    },
+    {
+     "level": "Class",
+     "category": "Not evaluated",
+     "count": "1"
+    },
+    {
+     "level": "Pair",
+     "category": "Enabled",
+     "count": "61"
+    },
+    {
+     "level": "Pair",
+     "category": "Passed, on hold",
+     "count": "1"
+    },
+    {
+     "level": "Pair",
+     "category": "Near miss",
+     "count": "4"
+    },
+    {
+     "level": "Pair",
+     "category": "Fails",
+     "count": "36"
+    },
+    {
+     "level": "Pair",
+     "category": "Withdrawn",
+     "count": "5"
+    }
+   ]
+  },
+  "history": {
+   "columns": [
+    "date",
+    "event",
+    "enabled_pairs"
+   ],
+   "rows": [
+    {
+     "date": "2026-10-28",
+     "event": "set39fix baseline",
+     "enabled_pairs": "39"
+    },
+    {
+     "date": "2026-11-05",
+     "event": "set45 baseline adoption",
+     "enabled_pairs": "50"
+    },
+    {
+     "date": "2026-11-06",
+     "event": "set46 top-up (colistin x S. enterica)",
+     "enabled_pairs": "51"
+    },
+    {
+     "date": "2026-11-07",
+     "event": "study 35651495 quarantine (ceftazidime x S. enterica withdrawn)",
+     "enabled_pairs": "50"
+    },
+    {
+     "date": "2026-11-08",
+     "event": "set49 top-up (gentamicin x E. coli, trimethoprim x K. pneumoniae)",
+     "enabled_pairs": "105"
+    }
+   ]
+  },
+  "progress": {
+   "columns": [
+    "order",
+    "stage",
+    "part",
+    "done",
+    "total",
+    "pct",
+    "elapsed_min",
+    "eta_min",
+    "running_step"
+   ],
+   "rows": []
+  },
+  "rounds": {
+   "columns": [
+    "round",
+    "date",
+    "pair",
+    "genomes_qualified",
+    "hours",
+    "status",
+    "gate",
+    "decision",
+    "hold_s",
+    "me_max",
+    "abst_max"
+   ],
+   "rows": [
+    {
+     "round": "set46_topup_v2_20261106",
+     "date": "2026-11-06",
+     "pair": "tigecycline / Acinetobacter baumannii",
+     "genomes_qualified": "38",
+     "hours": "3.4",
+     "status": "closed",
+     "gate": "PASS",
+     "decision": "on hold",
+     "hold_s": "42",
+     "me_max": "0.0",
+     "abst_max": "9.52"
+    },
+    {
+     "round": "set46_topup_v2_20261106",
+     "date": "2026-11-06",
+     "pair": "colistin / Salmonella enterica",
+     "genomes_qualified": "38",
+     "hours": "3.4",
+     "status": "closed",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "34",
+     "me_max": "0.0",
+     "abst_max": "2.33"
+    },
+    {
+     "round": "set47_route3_20261106",
+     "date": "2026-11-06",
+     "pair": "ciprofloxacin / Salmonella enterica",
+     "genomes_qualified": "217",
+     "hours": "7.2",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "enabled",
+     "hold_s": "206",
+     "me_max": "0.97",
+     "abst_max": "18.89"
+    },
+    {
+     "round": "set48_route3_20261107",
+     "date": "2026-11-07",
+     "pair": "ciprofloxacin / Salmonella enterica",
+     "genomes_qualified": "",
+     "hours": "0.6",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set48_route3_v2_20261107",
+     "date": "2026-11-07",
+     "pair": "ciprofloxacin / Salmonella enterica",
+     "genomes_qualified": "44",
+     "hours": "3.6",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "44",
+     "me_max": "0.0",
+     "abst_max": "0.0"
+    },
+    {
+     "round": "set49_topup_20261107",
+     "date": "2026-11-07",
+     "pair": "gentamicin / Escherichia coli",
+     "genomes_qualified": "",
+     "hours": "0.7",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set49_topup_20261107",
+     "date": "2026-11-07",
+     "pair": "trimethoprim / Klebsiella pneumoniae",
+     "genomes_qualified": "",
+     "hours": "0.7",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set49_topup_v2_20261107",
+     "date": "2026-11-07",
+     "pair": "gentamicin / Escherichia coli",
+     "genomes_qualified": "",
+     "hours": "0.7",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set49_topup_v2_20261107",
+     "date": "2026-11-07",
+     "pair": "trimethoprim / Klebsiella pneumoniae",
+     "genomes_qualified": "",
+     "hours": "0.7",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set49_topup_v3_20261108",
+     "date": "2026-11-08",
+     "pair": "gentamicin / Escherichia coli",
+     "genomes_qualified": "45",
+     "hours": "3.9",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "436",
+     "me_max": "2.98",
+     "abst_max": "1.11"
+    },
+    {
+     "round": "set49_topup_v3_20261108",
+     "date": "2026-11-08",
+     "pair": "trimethoprim / Klebsiella pneumoniae",
+     "genomes_qualified": "45",
+     "hours": "3.9",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "41",
+     "me_max": "0.0",
+     "abst_max": "0.0"
+    },
+    {
+     "round": "set50_topup_20261108",
+     "date": "2026-11-08",
+     "pair": "chloramphenicol / Klebsiella pneumoniae",
+     "genomes_qualified": "35",
+     "hours": "0.6",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set50_topup_v3_20261108",
+     "date": "2026-11-08",
+     "pair": "chloramphenicol / Klebsiella pneumoniae",
+     "genomes_qualified": "35",
+     "hours": "3.6",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "awaiting owner decision",
+     "hold_s": "40",
+     "me_max": "5.0",
+     "abst_max": "2.04"
+    },
+    {
+     "round": "set51_auto_20261109",
+     "date": "2026-11-09",
+     "pair": "linezolid / Enterococcus faecium",
+     "genomes_qualified": "86",
+     "hours": "3.6",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "21",
+     "me_max": "0.0",
+     "abst_max": "0.0"
+    },
+    {
+     "round": "set51_auto_20261109",
+     "date": "2026-11-09",
+     "pair": "cefuroxime / Streptococcus pneumoniae",
+     "genomes_qualified": "86",
+     "hours": "3.6",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "enabled",
+     "hold_s": "159",
+     "me_max": "0.0",
+     "abst_max": "12.65"
+    },
+    {
+     "round": "set52_auto_20261110",
+     "date": "2026-11-10",
+     "pair": "azithromycin / Neisseria gonorrhoeae",
+     "genomes_qualified": "96",
+     "hours": "3.7",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "40",
+     "me_max": "0.0",
+     "abst_max": "2.04"
+    },
+    {
+     "round": "set52_auto_20261110",
+     "date": "2026-11-10",
+     "pair": "cefuroxime / Streptococcus pneumoniae",
+     "genomes_qualified": "96",
+     "hours": "3.7",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "enabled",
+     "hold_s": "229",
+     "me_max": "0.0",
+     "abst_max": "14.83"
+    },
+    {
+     "round": "set53_auto_20261110",
+     "date": "2026-11-10",
+     "pair": "azithromycin / Shigella sonnei",
+     "genomes_qualified": "",
+     "hours": "0.1",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set53_auto_20261110",
+     "date": "2026-11-10",
+     "pair": "moxifloxacin / Staphylococcus aureus",
+     "genomes_qualified": "",
+     "hours": "0.1",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set53_auto_20261110",
+     "date": "2026-11-10",
+     "pair": "ceftriaxone / Shigella sonnei",
+     "genomes_qualified": "",
+     "hours": "0.1",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set53_auto_20261110",
+     "date": "2026-11-10",
+     "pair": "cefpodoxime / Escherichia coli",
+     "genomes_qualified": "",
+     "hours": "0.1",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set53_auto_20261110",
+     "date": "2026-11-10",
+     "pair": "cefotaxime / Escherichia coli",
+     "genomes_qualified": "",
+     "hours": "0.1",
+     "status": "halted",
+     "gate": "no result",
+     "decision": "",
+     "hold_s": "",
+     "me_max": "",
+     "abst_max": ""
+    },
+    {
+     "round": "set53_auto_v2_20261110",
+     "date": "2026-11-10",
+     "pair": "azithromycin / Shigella sonnei",
+     "genomes_qualified": "271",
+     "hours": "5.2",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "22",
+     "me_max": "0.0",
+     "abst_max": "0.0"
+    },
+    {
+     "round": "set53_auto_v2_20261110",
+     "date": "2026-11-10",
+     "pair": "moxifloxacin / Staphylococcus aureus",
+     "genomes_qualified": "271",
+     "hours": "5.2",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "awaiting owner decision",
+     "hold_s": "16",
+     "me_max": "0.0",
+     "abst_max": "6.0"
+    },
+    {
+     "round": "set53_auto_v2_20261110",
+     "date": "2026-11-10",
+     "pair": "ceftriaxone / Shigella sonnei",
+     "genomes_qualified": "271",
+     "hours": "5.2",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "28",
+     "me_max": "0.0",
+     "abst_max": "0.0"
+    },
+    {
+     "round": "set53_auto_v2_20261110",
+     "date": "2026-11-10",
+     "pair": "cefpodoxime / Escherichia coli",
+     "genomes_qualified": "271",
+     "hours": "5.2",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "awaiting owner decision",
+     "hold_s": "43",
+     "me_max": "18.6",
+     "abst_max": "2.86"
+    },
+    {
+     "round": "set53_auto_v2_20261110",
+     "date": "2026-11-10",
+     "pair": "cefotaxime / Escherichia coli",
+     "genomes_qualified": "271",
+     "hours": "5.2",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "354",
+     "me_max": "0.56",
+     "abst_max": "6.11"
+    },
+    {
+     "round": "set54_auto_20261111",
+     "date": "2026-11-11",
+     "pair": "ampicillin-sulbactam / Escherichia coli",
+     "genomes_qualified": "49",
+     "hours": "3.3",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "awaiting owner decision",
+     "hold_s": "42",
+     "me_max": "11.9",
+     "abst_max": "10.77"
+    },
+    {
+     "round": "set54_auto_20261111",
+     "date": "2026-11-11",
+     "pair": "penicillin / Staphylococcus aureus",
+     "genomes_qualified": "49",
+     "hours": "3.3",
+     "status": "done",
+     "gate": "PASS",
+     "decision": "enabled",
+     "hold_s": "21",
+     "me_max": "0.0",
+     "abst_max": "0.0"
+    },
+    {
+     "round": "set54_auto_20261111",
+     "date": "2026-11-11",
+     "pair": "moxifloxacin / Staphylococcus aureus",
+     "genomes_qualified": "49",
+     "hours": "3.3",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "awaiting owner decision",
+     "hold_s": "16",
+     "me_max": "0.0",
+     "abst_max": "6.0"
+    },
+    {
+     "round": "set54_auto_20261111",
+     "date": "2026-11-11",
+     "pair": "gentamicin / Enterococcus faecium",
+     "genomes_qualified": "49",
+     "hours": "3.3",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "enabled",
+     "hold_s": "28",
+     "me_max": "0.0",
+     "abst_max": "10.81"
+    },
+    {
+     "round": "set54_auto_20261111",
+     "date": "2026-11-11",
+     "pair": "trimethoprim-sulfamethoxazole / Streptococcus pneumoniae",
+     "genomes_qualified": "49",
+     "hours": "3.3",
+     "status": "done",
+     "gate": "FAIL",
+     "decision": "awaiting owner decision",
+     "hold_s": "217",
+     "me_max": "4.15",
+     "abst_max": "11.02"
+    }
+   ]
+  }
+ }
+}
